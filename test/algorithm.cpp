@@ -66,13 +66,13 @@ constexpr int getAge(const Person& person)
 
 constexpr int minAge = cgs::transform_reduce(people.begin(), people.end(),
     getAge,
-    [](int a, int b) { return std::min(a, b); },
+    cgs::min2<int>,
     std::numeric_limits<int>::max()
 );
 
 constexpr int maxAge = cgs::transform_reduce(people.begin(), people.end(),
     getAge,
-    [](int a, int b) { return std::max(a, b); }
+    cgs::max2<int>
 );
 
 TEST(Algorithm, TransformReduceStruct)

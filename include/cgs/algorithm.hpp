@@ -51,6 +51,22 @@ constexpr T transform_reduce(InputIt first, Sentinal last, UnaryOp unaryOp, Bina
     return init;
 }
 
+// std::min and std::max have various overloads,
+// making them tedious to use compositionally (need to static_cast)
+// we add min2 and max2, to help.
+
+template <typename T>
+constexpr const T& min2(const T& a, const T& b)
+{
+    return (a < b) ? a : b;
+}
+
+template <typename T>
+constexpr const T& max2(const T& a, const T& b)
+{
+    return (a < b) ? b : a;
+}
+
 } // namespace cgs
 
 #endif // CGS_ALGORITHM_HPP
