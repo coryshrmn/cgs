@@ -1,17 +1,17 @@
 language: cpp
 dist: trusty
-sudo: false
+sudo: true
 matrix:
     include:
-        -   os: linux
-            compiler: gcc
-            addons: &gcc6
-                apt:
-                    sources: ['ubuntu-toolchain-r-test']
-                    packages:
-                        - 'g++-7'
-                        - 'libboost-dev'
-            env: C_COMPILER='gcc-7' CXX_COMPILER='g++-7'
+#        -   os: linux
+#            compiler: gcc
+#            addons: &gcc6
+#                apt:
+#                    sources: ['ubuntu-toolchain-r-test']
+#                    packages:
+#                        - 'g++-7'
+#                        - 'libboost-dev'
+#            env: C_COMPILER='gcc-7' CXX_COMPILER='g++-7'
         -   os: linux
             compiler: clang
             addons: &clang40
