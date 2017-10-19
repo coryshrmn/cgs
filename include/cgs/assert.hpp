@@ -17,6 +17,8 @@
 #ifndef CGS_ASSERT_HPP
 #define CGS_ASSERT_HPP
 
+#include "cgs/optimize.hpp"
+
 /*
 To customize how logic errors are handled, you can `#define` one of:
 * `CGS_ASSERT_IGNORE` do not evaluate asserted expressions
@@ -43,47 +45,48 @@ To customize how logic errors are handled, you can `#define` one of:
 
 #ifdef CGS_ASSERT_IGNORE
 
-// potentially allow undefined behavior, don't evaluate the expression
-#define cgs_assert(expr) (static_cast<void>(0))
+    // undefined behavior unless expr, don't evaluate the expression
 
-#else
+    #define cgs_assert(expr) cgs_assume(expr)
 
-#include <sstream> // ostringstream message builder
+#else // not ignoring; either throw or abort
 
-#ifdef CGS_ASSERT_THROW
-#include <stdexcept> // logic_error
-#else
-#include <cstdlib> // abort
-#endif
+    #include <sstream> // ostringstream message builder
 
-namespace cgs { namespace detail {
+    #ifdef CGS_ASSERT_THROW
+        #include <stdexcept> // logic_error
+    #else
+        #include <cstdlib> // abort
+    #endif
 
-#ifdef CGS_ASSERT_THROW
-[[noreturn]] inline void assertThrow(const char* expression, const char* sourceName, unsigned int sourceLine)
-{
-    std::ostringstream message;
-    message << "Assertion failed (" << expression << ") at " << sourceName << ":" << sourceLine;
-    throw std::logic_error(message.str());
-}
-#define cgs_detail_assert_fail(expression) cgs::detail::assertThrow(#expression, __FILE__, __LINE__)
-#else // CGS_ASSERT_ABORT
-[[noreturn]] inline void assertAbort(const char* expression, const char* sourceName, unsigned int sourceLine)
-{
-    std::ostringstream message;
-    message << "Assertion failed (" << expression << ") at " << sourceName << ":" << sourceLine << "\n";
-    std::cerr << message.str() << std::flush;
-    std::abort();
-}
-#define cgs_detail_assert_fail(expression) cgs::detail::assertAbort(#expression, __FILE__, __LINE__)
-#endif
+    namespace cgs { namespace detail {
 
-}} // namespace cgs::detail
+    #ifdef CGS_ASSERT_THROW
+        [[noreturn]] inline void assertThrow(const char* expression, const char* sourceName, unsigned int sourceLine)
+        {
+            std::ostringstream message;
+            message << "Assertion failed (" << expression << ") at " << sourceName << ":" << sourceLine;
+            throw std::logic_error(message.str());
+        }
+        #define cgs_detail_assert_fail(expression) cgs::detail::assertThrow(#expression, __FILE__, __LINE__)
+    #elif defined(CGS_ASSERT_ABORT)
+        [[noreturn]] inline void assertAbort(const char* expression, const char* sourceName, unsigned int sourceLine)
+        {
+            std::ostringstream message;
+            message << "Assertion failed (" << expression << ") at " << sourceName << ":" << sourceLine << "\n";
+            std::cerr << message.str() << std::flush;
+            std::abort();
+        }
+        #define cgs_detail_assert_fail(expression) cgs::detail::assertAbort(#expression, __FILE__, __LINE__)
+    #endif
 
-#define cgs_assert(expression) ( \
-    static_cast<bool>(expression) \
-        ? static_cast<void>(0) \
-        : cgs_detail_assert_fail(expression) \
-    )
+    }} // namespace cgs::detail
+
+    #define cgs_assert(expression) ( \
+        cgs_likely(expression) \
+            ? static_cast<void>(0) \
+            : cgs_detail_assert_fail(expression) \
+        )
 
 #endif
 

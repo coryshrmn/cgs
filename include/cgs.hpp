@@ -18,5 +18,6 @@
 #define CGS_HPP
 
 #include "cgs/assert.hpp"
+#include "cgs/optimize.hpp"
 
 #endif // CGS_HPP

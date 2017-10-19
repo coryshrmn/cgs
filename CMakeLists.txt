@@ -24,8 +24,10 @@ enable_testing()
 include_directories(include)
 
 set(CGS_HEADERS
-    "include/cgs/assert.hpp"
     "include/cgs.hpp"
+
+    "include/cgs/assert.hpp"
+    "include/cgs/optimize.hpp"
 )
 
 set(CGS_TEST_SOURCE
