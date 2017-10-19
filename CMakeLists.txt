@@ -26,6 +26,7 @@ include_directories(include)
 set(CGS_HEADERS
     "include/cgs.hpp"
 
+    "include/cgs/algorithm.hpp"
     "include/cgs/assert.hpp"
     "include/cgs/macro.hpp"
     "include/cgs/optimize.hpp"
@@ -33,8 +34,9 @@ set(CGS_HEADERS
 )
 
 set(CGS_TEST_SOURCE
-    "test/assert.cpp"
+    "test/algorithm.cpp"
     "test/assert_abort.cpp"
+    "test/assert.cpp"
     "test/assert_debug.cpp"
     "test/assert_release.cpp"
     "test/assert_throw.cpp"

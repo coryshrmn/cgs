@@ -17,6 +17,7 @@
 #ifndef CGS_HPP
 #define CGS_HPP
 
+#include "cgs/algorithm.hpp"
 #include "cgs/assert.hpp"
 #include "cgs/macro.hpp"
 #include "cgs/optimize.hpp"
