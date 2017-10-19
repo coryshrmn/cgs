@@ -1,4 +1,4 @@
-# CGS [![Build Status](https://travis-ci.org/coryshrmn/cgw.svg?branch=feature/travis-clang)](https://travis-ci.org/coryshrmn/cgs)
+# CGS [![Build Status](https://travis-ci.org/coryshrmn/cgs.svg?branch=feature/travis-clang)](https://travis-ci.org/coryshrmn/cgs)
 
 Header-only C++17 standard supplement, including:
 1. Things I wish were in the C++ standard
