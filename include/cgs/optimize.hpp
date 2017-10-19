@@ -16,14 +16,14 @@
 #endif
 
 #if defined(__clang__) || defined(__GNUC__)
-    #define cgs_likely(expr) static_cast<bool>(__builtin_expect(static_cast<bool>(expr), 1))
-    #define cgs_unlikely(expr) static_cast<bool>(__builtin_expect(static_cast<bool>(expr), 0))
+    #define cgs_expect(expr, val) __builtin_expect(expr, val)
     #define cgs_unreachable() __builtin_unreachable()
 #else
-    #define cgs_likely(expr) static_cast<bool>(expr)
-    #define cgs_unlikely(expr) static_cast<bool>(expr)
+    #define cgs_expect(expr, val) (expr)
     #define cgs_unreachable() static_cast<void>(0)
 #endif
 
+#define cgs_likely(expr) static_cast<bool>(cgs_expect(static_cast<bool>(expr), 1))
+#define cgs_unlikely(expr) static_cast<bool>(cgs_expect(static_cast<bool>(expr), 0))
 
 #endif // CGS_OPTIMIZE_HPP
