@@ -5,7 +5,6 @@
  * cgs_assume(expr)
  *
  * @brief Optimizer hint, do not evaluate.
- * /
  */
 #ifdef __clang__
     #define cgs_assume(expr) __builtin_assume(expr)
@@ -23,7 +22,18 @@
     #define cgs_unreachable() static_cast<void>(0)
 #endif
 
+/**
+ * cgs_likely(expr)
+ *
+ * @brief Evaluate the boolean expression, predict true branch.
+ */
 #define cgs_likely(expr) static_cast<bool>(cgs_expect(static_cast<bool>(expr), 1))
+
+/**
+ * cgs_unlikely(expr)
+ *
+ * @brief Evaluate the boolean expression, predict false branch.
+ */
 #define cgs_unlikely(expr) static_cast<bool>(cgs_expect(static_cast<bool>(expr), 0))
 
 #endif // CGS_OPTIMIZE_HPP

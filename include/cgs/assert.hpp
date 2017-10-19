@@ -17,7 +17,8 @@
 #ifndef CGS_ASSERT_HPP
 #define CGS_ASSERT_HPP
 
-#include "cgs/optimize.hpp"
+#include "cgs/macro.hpp" // CGS_LINE
+#include "cgs/optimize.hpp" // cgs_assume, cgs_likely
 
 /*
 To customize how logic errors are handled, you can `#define` one of:
@@ -51,36 +52,22 @@ To customize how logic errors are handled, you can `#define` one of:
 
 #else // not ignoring; either throw or abort
 
-    #include <sstream> // ostringstream message builder
-
     #ifdef CGS_ASSERT_THROW
         #include <stdexcept> // logic_error
     #else
         #include <cstdlib> // abort
+        #include <cstdio> // fputs, stderr
     #endif
-
-    namespace cgs { namespace detail {
 
     #ifdef CGS_ASSERT_THROW
-        [[noreturn]] inline void assertThrow(const char* expression, const char* sourceName, unsigned int sourceLine)
-        {
-            std::ostringstream message;
-            message << "Assertion failed (" << expression << ") at " << sourceName << ":" << sourceLine;
-            throw std::logic_error(message.str());
-        }
-        #define cgs_detail_assert_fail(expression) cgs::detail::assertThrow(#expression, __FILE__, __LINE__)
+        #define cgs_detail_assert_fail(expression) throw std::logic_error("Assertion failed (" #expression ") at " __FILE__ ":" CGS_LINE)
     #elif defined(CGS_ASSERT_ABORT)
-        [[noreturn]] inline void assertAbort(const char* expression, const char* sourceName, unsigned int sourceLine)
-        {
-            std::ostringstream message;
-            message << "Assertion failed (" << expression << ") at " << sourceName << ":" << sourceLine << "\n";
-            std::cerr << message.str() << std::flush;
-            std::abort();
-        }
-        #define cgs_detail_assert_fail(expression) cgs::detail::assertAbort(#expression, __FILE__, __LINE__)
+        #define cgs_detail_assert_fail(expression) ( \
+            std::fputs("Assertion failed (" #expression ") at " __FILE__ ":" CGS_LINE "\n", stderr), \
+            std::fflush(stderr), \
+            std::abort() \
+        )
     #endif
-
-    }} // namespace cgs::detail
 
     #define cgs_assert(expression) ( \
         cgs_likely(expression) \

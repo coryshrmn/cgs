@@ -27,6 +27,7 @@ set(CGS_HEADERS
     "include/cgs.hpp"
 
     "include/cgs/assert.hpp"
+    "include/cgs/macro.hpp"
     "include/cgs/optimize.hpp"
 )
 
