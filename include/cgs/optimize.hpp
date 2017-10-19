@@ -19,7 +19,7 @@
     #define cgs_expect(expr, val) __builtin_expect(expr, val)
     #define cgs_unreachable() __builtin_unreachable()
 #else
-    #define cgs_expect(expr, val) (expr)
+    #define cgs_expect(expr, val) static_cast<long>(expr)
     #define cgs_unreachable() static_cast<void>(0)
 #endif
 
