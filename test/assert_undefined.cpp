@@ -26,7 +26,6 @@ static bool save(int value) {
 
 TEST(Assert, NotEvaluated)
 {
-    
     EXPECT_EQ(saved, 0);
     cgs_assert(save(1));
     EXPECT_EQ(saved, 0);

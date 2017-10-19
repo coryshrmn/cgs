@@ -38,6 +38,10 @@ set(CGS_TEST_SOURCE
     "test/assert_undefined.cpp"
     "test/unowned_ptr.cpp"
 )
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    # disable warning for assume with side effect. We're intentionally testing assume with side effects.
+    set_source_files_properties("test/assert_undefined.cpp" PROPERTIES COMPILE_FLAGS -Wno-assume)
+endif()
 
 # main test
 add_executable(cgs-test
