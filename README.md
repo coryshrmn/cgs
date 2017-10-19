@@ -49,7 +49,7 @@ T operator[](size_t i) {
 ### Tested compilers
 
 * g++ 7
-* clang++ 5.0
+* ~clang++ 5.0~ Travis errors while downloading clang++ 5.0 recently.
 
 
 ## License
