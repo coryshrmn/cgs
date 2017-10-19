@@ -20,11 +20,10 @@
 #include <utility> // declval
 
 // Similar to standard <algorithm> and <numeric>,
-// with constexpr.
+// with constexpr everywhere.
 
-// We occasionally use a different parameter order than the standard.
-// For example. transform_reduce takes the initial value last, so it can be defaulted {}.
-// Also switched unary and binary operations because transform comes before reduce, intuitively.
+// I occasionally change the parameter order, to what I consider intuitive.
+// transform_reduce is changed from (init, binary, unary) to (unary, binary, init = {})
 
 namespace cgs
 {
@@ -52,8 +51,8 @@ constexpr T transform_reduce(InputIt first, Sentinal last, UnaryOp unaryOp, Bina
 }
 
 // std::min and std::max have various overloads,
-// making them tedious to use compositionally (need to static_cast)
-// we add min2 and max2, to help.
+// making them tedious to use compositionally (need to static_cast to specify which overload).
+// We have min2 and max2, with no overloads.
 
 template <typename T>
 constexpr const T& min2(const T& a, const T& b)
