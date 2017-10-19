@@ -167,3 +167,9 @@ private:
 
 static_assert(is_trivially_copyable_v<Foo>);
 static_assert(is_trivially_destructible_v<Foo>);
+
+TEST(Unowned, Deduce)
+{
+    int ival = 5;
+    unowned_ptr ptr { &ival };
+}
