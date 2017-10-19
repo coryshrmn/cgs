@@ -20,5 +20,6 @@
 #include "cgs/assert.hpp"
 #include "cgs/macro.hpp"
 #include "cgs/optimize.hpp"
+#include "cgs/unowned_ptr.hpp"
 
 #endif // CGS_HPP
