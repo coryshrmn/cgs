@@ -46,8 +46,15 @@ add_executable(cgs-test
 )
 add_test(NAME cgs-test COMMAND cgs-test)
 
-set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD 17)
-set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD_REQUIRED ON)
+# cmake added c++17 support in version 3.8
+if(CMAKE_VERSION VERSION_LESS 3.8)
+    if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1z")
+    endif()
+else()
+    set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD 17)
+    set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD_REQUIRED ON)
+endif()
 
 # Download and compile Googletest library
 include(ExternalProject)
