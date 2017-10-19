@@ -15,8 +15,15 @@
 */
 #include "gtest/gtest.h"
 
-#define CGS_VIOLATE_IGNORE
 #include "cgs/assert.hpp"
+
+#include <regex>
+
+TEST(Assert, ManualAbort)
+{
+    cgs_assert_abort(2 + 2 == 4);
+    EXPECT_DEATH(cgs_assert_abort(2 + 2 == 5), R"(Assertion failed \(2 \+ 2 == 5\) at .*/test/assert\.cpp:25)");
+}
 
 static int saved = 0;
 static bool save(int value) {
@@ -24,11 +31,26 @@ static bool save(int value) {
     return false;
 }
 
-TEST(Assert, NotEvaluated)
+TEST(Assert, ManualIgnore)
 {
-    cgs_assert(true);
-    cgs_assert(false);
+    cgs_assert_ignore(true);
     EXPECT_EQ(saved, 0);
-    cgs_assert(save(1));
+    cgs_assert_ignore(save(1));
     EXPECT_EQ(saved, 0);
+}
+
+TEST(Assert, ManualThrow)
+{
+    cgs_assert_throw(2 + 2 == 4);
+    try {
+        cgs_assert_throw(2 + 2 == 5);
+        EXPECT_FALSE(true);
+    }
+    catch(const std::logic_error& e) {
+        std::string reString { R"(Assertion failed \(2 \+ 2 == 5\) at .*/test/assert\.cpp:46)" };
+        std::regex re { reString };
+        EXPECT_TRUE(std::regex_match(e.what(), re))
+            << "  Actual: \"" <<  e.what() << "\"\n"
+            << "Expected: \"" << reString << "\"\n";
+    }
 }

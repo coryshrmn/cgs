@@ -27,14 +27,14 @@ and add `#include "cgs.hpp"` in your code.
 ```cpp
 // default in release builds (with NDEBUG defined)
 // asserted expressions are not evaluated
-#define CGS_ASSERT_IGNORE
+#define CGS_VIOLATE_IGNORE
 
 // default in debug builds (NDEBUG not defined)
 // print an error message and abort
-#define CGS_ASSERT_ABORT
+#define CGS_VIOLATE_ABORT
 
 // throw a std::logic_error instead of aborting
-#define CGS_ASSERT_THROW
+#define CGS_VIOLATE_THROW
 
 #include "cgs/assert.hpp"
 

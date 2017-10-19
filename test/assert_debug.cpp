@@ -15,13 +15,13 @@
 */
 #include "gtest/gtest.h"
 
-#define CGS_VIOLATE_ABORT
+#undef NDEBUG
 #include "cgs/assert.hpp"
 
 #include <regex>
 
-TEST(Assert, Abort)
+TEST(Assert, DebugAbort)
 {
     cgs_assert(2 + 2 == 4);
-    EXPECT_DEATH(cgs_assert(2 + 2 == 5), R"(Assertion failed \(2 \+ 2 == 5\) at .*/test/assert_abort\.cpp:26)");
+    EXPECT_DEATH(cgs_assert(2 + 2 == 5), R"(Assertion failed \(2 \+ 2 == 5\) at .*/test/assert_debug\.cpp:26)");
 }

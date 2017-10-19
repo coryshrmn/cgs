@@ -15,7 +15,7 @@
 */
 #include "gtest/gtest.h"
 
-#define CGS_ASSERT_THROW
+#define CGS_VIOLATE_THROW
 #include "cgs/unowned_ptr.hpp"
 
 using cgs::unowned_ptr;

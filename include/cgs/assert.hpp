@@ -20,61 +20,55 @@
 #include "cgs/macro.hpp" // CGS_LINE
 #include "cgs/optimize.hpp" // cgs_assume, cgs_likely
 
+#include <cstdio> // fputs, stderr
+#include <cstdlib> // abort
+#include <stdexcept> // logic_error
+
 /*
 To customize how logic errors are handled, you can `#define` one of:
-* `CGS_ASSERT_IGNORE` do not evaluate asserted expressions
-* `CGS_ASSERT_THROW` throw if an assertion fails
-* `CGS_ASSERT_ABORT` print to stderr and abort if an assertion fails
+* `CGS_VIOLATE_ABORT` print to stderr and abort if an assertion fails
+* `CGS_VIOLATE_IGNORE` do not evaluate asserted expressions
+* `CGS_VIOLATE_THROW` throw if an assertion fails
 
 */
 
 // default if no option is set:
 // IGNORE on NDEBUG.
 // ABORT on debug
-#if !(defined(CGS_ASSERT_IGNORE) || defined(CGS_ASSERT_THROW) || defined(CGS_ASSERT_ABORT))
+#if !(defined(CGS_VIOLATE_ABORT) || defined(CGS_VIOLATE_IGNORE) || defined(CGS_VIOLATE_THROW))
     #ifdef NDEBUG
-        #define CGS_ASSERT_IGNORE
+        #define CGS_VIOLATE_IGNORE
     #else
-        #define CGS_ASSERT_ABORT
+        #define CGS_VIOLATE_ABORT
     #endif
 #endif
 
 // validate option
-#if defined(CGS_ASSERT_IGNORE) + defined(CGS_ASSERT_THROW) + defined(CGS_ASSERT_ABORT) != 1
-    #error There can only be one CGS_ASSERT_*
+#if defined(CGS_VIOLATE_ABORT) + defined(CGS_VIOLATE_IGNORE) + defined(CGS_VIOLATE_THROW) != 1
+    #error There can only be one CGS_VIOLATE_*
 #endif
 
-#ifdef CGS_ASSERT_IGNORE
+#define cgs_assert_abort(expression) ( cgs_likely(expression) \
+    ? static_cast<void>(0) \
+    : (std::fputs("Assertion failed (" #expression ") at " __FILE__ ":" CGS_LINE "\n", stderr), \
+        std::fflush(stderr), \
+        std::abort() \
+    ) \
+)
 
-    // undefined behavior unless expr, don't evaluate the expression
+#define cgs_assert_ignore(expr) cgs_assume(expr)
 
-    #define cgs_assert(expr) cgs_assume(expr)
+#define cgs_assert_throw(expression) ( cgs_likely(expression) \
+    ? static_cast<void>(0) \
+    : throw std::logic_error("Assertion failed (" #expression ") at " __FILE__ ":" CGS_LINE) \
+)
 
-#else // not ignoring; either throw or abort
-
-    #ifdef CGS_ASSERT_THROW
-        #include <stdexcept> // logic_error
-    #else
-        #include <cstdlib> // abort
-        #include <cstdio> // fputs, stderr
-    #endif
-
-    #ifdef CGS_ASSERT_THROW
-        #define cgs_detail_assert_fail(expression) throw std::logic_error("Assertion failed (" #expression ") at " __FILE__ ":" CGS_LINE)
-    #elif defined(CGS_ASSERT_ABORT)
-        #define cgs_detail_assert_fail(expression) ( \
-            std::fputs("Assertion failed (" #expression ") at " __FILE__ ":" CGS_LINE "\n", stderr), \
-            std::fflush(stderr), \
-            std::abort() \
-        )
-    #endif
-
-    #define cgs_assert(expression) ( \
-        cgs_likely(expression) \
-            ? static_cast<void>(0) \
-            : cgs_detail_assert_fail(expression) \
-        )
-
+#ifdef CGS_VIOLATE_ABORT
+    #define cgs_assert(expr) cgs_assert_abort(expr)
+#elif defined(CGS_VIOLATE_IGNORE)
+    #define cgs_assert(expr) cgs_assert_ignore(expr)
+#elif defined(CGS_VIOLATE_THROW)
+    #define cgs_assert(expr) cgs_assert_throw(expr)
 #endif
 
 #endif // CGS_ASSERT_HPP

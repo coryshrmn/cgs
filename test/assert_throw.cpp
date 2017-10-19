@@ -15,19 +15,20 @@
 */
 #include "gtest/gtest.h"
 
-#define CGS_ASSERT_THROW
+#define CGS_VIOLATE_THROW
 #include "cgs/assert.hpp"
 
 #include <regex>
 
 TEST(Assert, Throw)
 {
+    cgs_assert(true);
     try {
         cgs_assert(2 + 2 == 5);
         EXPECT_FALSE(true);
     }
     catch(const std::logic_error& e) {
-        std::string reString { R"(Assertion failed \(2 \+ 2 == 5\) at .*/test/assert_throw\.cpp:26)" };
+        std::string reString { R"(Assertion failed \(2 \+ 2 == 5\) at .*/test/assert_throw\.cpp:27)" };
         std::regex re { reString };
         EXPECT_TRUE(std::regex_match(e.what(), re))
             << "  Actual: \"" <<  e.what() << "\"\n"
