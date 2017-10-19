@@ -22,6 +22,8 @@ matrix:
                         - 'clang-5.0'
                         - 'libboost-dev'
             env: C_COMPILER='clang-5.0' CXX_COMPILER='clang++-5.0'
+before_install:
+    - sudo apt-get update
 before_script:
     - export CC=${C_COMPILER}
     - export CXX=${CXX_COMPILER}
