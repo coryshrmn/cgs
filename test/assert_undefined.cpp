@@ -18,7 +18,16 @@
 #define CGS_ASSERT_IGNORE
 #include "cgs/assert.hpp"
 
+static int saved = 0;
+static bool save(int value) {
+    saved = value;
+    return false;
+}
+
 TEST(Assert, NotEvaluated)
 {
-    cgs_assert(invalid);
+    
+    EXPECT_EQ(saved, 0);
+    cgs_assert(save(1));
+    EXPECT_EQ(saved, 0);
 }

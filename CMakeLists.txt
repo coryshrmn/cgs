@@ -46,7 +46,7 @@ add_executable(cgs-test
 )
 add_test(NAME cgs-test COMMAND cgs-test)
 
-set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD 14)
+set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD 17)
 set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD_REQUIRED ON)
 
 # Download and compile Googletest library

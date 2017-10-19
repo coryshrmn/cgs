@@ -26,7 +26,7 @@
 #elif defined(_MSC_VER)
     #define cgs_assume(expr) __assume(expr)
 #else
-    #define cgs_assume(expr) static_cast<void>(0)
+    #define cgs_assume(expr) static_cast<void>(sizeof(expr))
 #endif
 
 #if defined(__clang__) || defined(__GNUC__)

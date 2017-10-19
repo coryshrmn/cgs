@@ -94,7 +94,7 @@ TEST(Unowned, Throw)
 }
 
 static int saved = 0;
-void save(int value) {
+static void save(int value) {
     saved = value;
 }
 
