@@ -112,3 +112,58 @@ TEST(Unowned, Function)
     pSave = {};
     EXPECT_ANY_THROW(pSave(2));
 }
+
+
+#include <type_traits>
+
+template <typename T>
+constexpr auto is_trivially_copyable_v = std::is_trivially_copyable<T>::value;
+
+template <typename T>
+constexpr auto is_trivially_destructible_v = std::is_trivially_destructible<T>::value;
+
+
+struct Resource
+{
+    void bind()
+    { }
+};
+
+using UpdateFunction = void(Resource&);
+
+struct Foo {
+
+    // Unowned pointers can be null.
+    unowned_ptr<Resource> resource {};
+    unowned_ptr<UpdateFunction> update {};
+
+    void tryUpdate() {
+        // use operator bool to determine if an unowned_ptr is null
+        if(resource && update) {
+            // We know resource and update are set before calling doUpdate()
+            doUpdate();
+        }
+    }
+
+private:
+    void doUpdate() {
+        // We require resource and update are already set.
+
+        // In debug builds, abort for null at runtime.
+        // In release builds, optimize null checks out.
+
+        // Can be configured to throw logic_errors, in case you can't risk UB in release. See cgs_assert.
+
+        // check resource with operator*
+        Resource& res = *resource;
+
+        // check resource with operator->
+        resource->bind();
+
+        // check update with function call
+        update(res);
+    }
+};
+
+static_assert(is_trivially_copyable_v<Foo>);
+static_assert(is_trivially_destructible_v<Foo>);
