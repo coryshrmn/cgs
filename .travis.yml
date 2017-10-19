@@ -9,7 +9,7 @@ matrix:
             compiler: clang
             env: C_COMPILER='clang-5.0' CXX_COMPILER='clang++-5.0'
 before_install:
-    - sudo add-apt-repository ppa::ubuntu-toolchain-r/test -y
+    - sudo add-apt-repository ppa::ubuntu-toolchain-r-test -y
     - sudo add-apt-repository ppa::llvm-toolchain-trusty-5.0 -y
     - sudo apt-get update
     - sudo apt-get install libboost-dev g++-7 libstdc++-7-dev clang-5.0
