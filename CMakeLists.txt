@@ -19,6 +19,10 @@ cmake_minimum_required(VERSION 3.2.2 FATAL_ERROR)
 
 project(cgs C CXX)
 
+if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -pedantic -Wall -Wextra -Weffc++ -Wno-language-extension-token -Wno-missing-braces")
+endif()
+
 enable_testing()
 
 include_directories(include)
@@ -73,6 +77,11 @@ if(CMAKE_VERSION VERSION_LESS 3.8)
 else()
     set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD 17)
     set_property(TARGET ${PROJECT_NAME}-test PROPERTY CXX_STANDARD_REQUIRED ON)
+endif()
+
+if(CMAKE_CXX_COMPILER_ID MATCHES "(GNU|Clang)")
+    # GTest library does not comply with effective C++
+    set_target_properties(${PROJECT_NAME}-test PROPERTIES COMPILE_FLAGS -Wno-effc++)
 endif()
 
 # Download and compile Googletest library

@@ -88,8 +88,8 @@ TEST(Math, LerpInfinities)
 
 TEST(Math, LerpDouble)
 {
-    constexpr double a = 500.0f;
-    constexpr double b = 1000.0f;
+    constexpr double a = 500.0;
+    constexpr double b = 1000.0;
     constexpr double half = lerp(a, b, 0.5);
     EXPECT_EQ(half, 750.0);
 }

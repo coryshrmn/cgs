@@ -45,7 +45,7 @@ int unsafe_v()
     throw 0;
 }
 
-int unsafe_i(int i)
+int unsafe_i(int)
 {
     throw 0;
 }
