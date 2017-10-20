@@ -51,7 +51,7 @@ constexpr bool constexpr_check(const bool&&)
  * @brief Can this function be invoked at compile time with default created parameters?
  */
 template <auto Func, typename... Args, typename = std::enable_if_t<std::is_invocable_v<decltype(Func), Args...>> >
-constexpr bool is_constexpr(Args&&...)
+constexpr bool is_constexpr()
 {
     return detail::constexpr_check<Func, Args...>(false);
 }

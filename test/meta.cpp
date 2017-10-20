@@ -53,31 +53,16 @@ int unsafe_i(int i)
 TEST(Meta, IsConstexpr)
 {
     EXPECT_TRUE( (is_constexpr<safe_v>()) );
-    EXPECT_TRUE( (is_constexpr<safe_p>(nullptr)) );
-    EXPECT_TRUE( (is_constexpr<safe_fi>(0.0f, 0)) );
+    EXPECT_TRUE( (is_constexpr<safe_p, std::nullptr_t>()) );
+    EXPECT_TRUE( (is_constexpr<safe_fi, float, int>()) );
 
     EXPECT_FALSE( (is_constexpr<unsafe_v>()) );
-    EXPECT_FALSE( (is_constexpr<safe_if_nonzero>(0)) );
+
+    // "strange" results: is_constexpr only considers default-initialized parameter values
+    EXPECT_TRUE( (is_constexpr<safe_if_zero, int>()) );
+    EXPECT_FALSE( (is_constexpr<safe_if_nonzero, int>()) );
 
     // can also check at compile time
-    static_assert(is_constexpr<safe_fi>(0.0f, 0));
+    static_assert(is_constexpr<safe_fi, float, int>());
     static_assert(!is_constexpr<unsafe_v>());
-}
-
-TEST(Meta, IsConstexprNonDefault)
-{
-    // false results for is_constexpr, when the parameter values effect constexpr-ness
-    //
-    // We pass default constructed arguments,
-    // so we are testing if unsafe_inot(0), which IS constexpr,
-    // even though unsafe_inot is not generally constexpr
-    // see GitHub issue #1
-    //
-    // I don't think it is possible to test if a function is generally constexpr.
-    //
-    // It might be possible check if Func is constexpr with provided values.
-    // I haven't figured it out yet.
-
-    EXPECT_TRUE( (is_constexpr<safe_if_nonzero>(5)) );
-    EXPECT_FALSE( (is_constexpr<safe_if_zero>(5)) );
 }
