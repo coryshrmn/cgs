@@ -96,6 +96,34 @@ TEST(Math, LerpDouble)
     EXPECT_EQ(half, 750.0);
 }
 
+TEST(Math, Clamp)
+{
+    static_assert(clamp(0.0, 0.0, 1.0) == 0.0);
+    static_assert(clamp(0.0f, 0.0f, 1.0f) == 0.0f);
+    static_assert(clamp(0, 0, 1) == 0);
+
+    static_assert(clamp(-1.0, 0.0, 1.0) == 0.0);
+    static_assert(clamp(-1, 0, 1) == 0);
+    static_assert(clamp(2, 0, 1) == 1);
+
+    static_assert(clamp(-INFINITY, 0.0f, 1.0f) == 0.0f);
+    static_assert(clamp(INFINITY, 0.0f, 1.0f) == 1.0f);
+
+    static_assert(clamp(-1000.0f, -INFINITY, 0.0f) == -1000.0f);
+    static_assert(clamp(-1000.0f, 0.0f, INFINITY) == 0.0f);
+}
+
+TEST(Math, IsBetween)
+{
+    static_assert(is_between(0.0f, 0.0f, 1.0f));
+    static_assert(is_between(0, 0, 1));
+    static_assert(is_between(1, 0, 1));
+
+    static_assert(!is_between(1, 1, 0));
+    static_assert(!is_between(2, 0, 1));
+    static_assert(!is_between(2, 0, 1));
+}
+
 TEST(Math, IsNaN)
 {
 #define is(x) static_assert(isnan(x)); static_assert(isnan_nobuiltin(x))
