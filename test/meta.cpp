@@ -64,9 +64,9 @@ TEST(Meta, IsConstexpr)
     static_assert(!is_constexpr<unsafe_v>());
 }
 
-TEST(Meta, IsConstexprSafeIfZero)
+TEST(Meta, IsConstexprNonDefault)
 {
-    // false positive for is_constexpr<safe_if_zero>
+    // false results for is_constexpr, when the parameter values effect constexpr-ness
     //
     // We pass default constructed arguments,
     // so we are testing if unsafe_inot(0), which IS constexpr,
@@ -78,5 +78,6 @@ TEST(Meta, IsConstexprSafeIfZero)
     // It might be possible check if Func is constexpr with provided values.
     // I haven't figured it out yet.
 
-    EXPECT_FALSE( (is_constexpr<safe_if_zero>(0)) );
+    EXPECT_TRUE( (is_constexpr<safe_if_nonzero>(5)) );
+    EXPECT_FALSE( (is_constexpr<safe_if_zero>(5)) );
 }
