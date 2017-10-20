@@ -33,22 +33,13 @@ constexpr bool ignore(T&&)
 namespace detail
 {
 
-template <
-    typename FunctionType,
-    std::decay_t<FunctionType> Function,
-    typename... Args,
-    bool = ignore(Function(Args{}...))
->
+template <auto Func, typename... Args, bool = ignore(Func(Args{}...)) >
 constexpr bool constexpr_check(bool&&)
 {
     return true;
 }
 
-template <
-    typename FunctionType,
-    std::decay_t<FunctionType> Function,
-    typename... Args
->
+template <auto Func, typename... Args>
 constexpr bool constexpr_check(const bool&&)
 {
     return false;
@@ -57,16 +48,12 @@ constexpr bool constexpr_check(const bool&&)
 } // namespace detail
 
 /**
- * @brief Is this function constexpr with these argument types?
+ * @brief Can this function be invoked at compile time with default created parameters?
  */
-template <
-    typename FunctionType,
-    std::decay_t<FunctionType> Function,
-    typename... Args
->
+template <auto Func, typename... Args>
 constexpr bool is_constexpr(Args&&...)
 {
-    return detail::constexpr_check<FunctionType, Function, Args...>(false);
+    return detail::constexpr_check<Func, Args...>(false);
 }
 
 } // namespace cgs

@@ -18,23 +18,58 @@
 #include "cgs/meta.hpp"
 using cgs::is_constexpr;
 
-#include <cstdlib> // rand
+constexpr int safe_v() { return 0; }
+constexpr int safe_p(void*) { return 0; }
+constexpr int safe_fi(float, int) { return 0; }
 
-constexpr bool isFive(int i)
+// constexpr if i != 0
+constexpr int safe_if_nonzero(int i)
 {
-    return i == 5;
+    if(i == 0) {
+        throw i;
+    }
+    return i;
 }
 
-bool isFiveOrRand(int i)
+// constexpr if i == 0
+constexpr int safe_if_zero(int i)
 {
-    return i == 5 || (i == std::rand() % 5);
+    if(i != 0) {
+        throw i;
+    }
+    return i;
+}
+
+int unsafe_v()
+{
+    throw 0;
+}
+
+int unsafe_i(int i)
+{
+    throw 0;
 }
 
 TEST(Meta, IsConstexpr)
 {
-    EXPECT_TRUE( (is_constexpr<decltype(isFive), &isFive>(5)) );
-    EXPECT_TRUE( (is_constexpr<decltype(isFive), &isFive>(6)) );
+    EXPECT_TRUE( (is_constexpr<safe_v>()) );
+    EXPECT_TRUE( (is_constexpr<safe_p>(nullptr)) );
+    EXPECT_TRUE( (is_constexpr<safe_fi>(0.0f, 0)) );
 
-    EXPECT_FALSE( (is_constexpr<decltype(isFiveOrRand), &isFiveOrRand>(5)) );
-    EXPECT_FALSE( (is_constexpr<decltype(isFiveOrRand), &isFiveOrRand>(6)) );
+    EXPECT_FALSE( (is_constexpr<unsafe_v>()) );
+    EXPECT_FALSE( (is_constexpr<safe_if_nonzero>(0)) );
+}
+
+TEST(Meta, IsConstexprSafeIfZero)
+{
+    // false positive for is_constexpr<safe_if_zero>
+    //
+    // We pass default constructed arguments,
+    // so we are testing if unsafe_inot(0), which IS constexpr,
+    // even though unsafe_inot is not generally constexpr
+    // see GitHub issue #1
+    //
+    // I don't know how we can test if a function is generally constexpr.
+
+    EXPECT_FALSE( (is_constexpr<safe_if_zero>(0)) );
 }
