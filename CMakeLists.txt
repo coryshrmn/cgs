@@ -30,11 +30,14 @@ set(CGS_HEADERS
     "include/cgs/assert.hpp"
     "include/cgs/macro.hpp"
     "include/cgs/math.hpp"
+    "include/cgs/meta.hpp"
     "include/cgs/optimize.hpp"
     "include/cgs/unowned_ptr.hpp"
+
 )
 
 set(CGS_TEST_SOURCE
+
     "test/algorithm.cpp"
     "test/assert_abort.cpp"
     "test/assert.cpp"
@@ -43,8 +46,11 @@ set(CGS_TEST_SOURCE
     "test/assert_throw.cpp"
     "test/assert_undefined.cpp"
     "test/math.cpp"
+    "test/meta.cpp"
     "test/unowned_ptr.cpp"
+
 )
+
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     # disable warning for assume with side effect. We're intentionally testing assume with side effects.
     set_source_files_properties("test/assert.cpp"           PROPERTIES COMPILE_FLAGS -Wno-assume)

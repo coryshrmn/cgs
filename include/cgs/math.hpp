@@ -17,6 +17,7 @@
 #define CGS_MATH_HPP
 
 #include "cgs/assert.hpp"
+#include "cgs/meta.hpp"
 
 #include <utility> // pair
 #include <cmath> // isnan, abs, tons of non constexpr stuff :(

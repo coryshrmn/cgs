@@ -13,16 +13,28 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
+#include "gtest/gtest.h"
 
-#ifndef CGS_HPP
-#define CGS_HPP
-
-#include "cgs/algorithm.hpp"
-#include "cgs/assert.hpp"
-#include "cgs/macro.hpp"
-#include "cgs/math.hpp"
 #include "cgs/meta.hpp"
-#include "cgs/optimize.hpp"
-#include "cgs/unowned_ptr.hpp"
+using cgs::is_constexpr;
 
-#endif // CGS_HPP
+#include <cstdlib> // rand
+
+constexpr bool isFive(int i)
+{
+    return i == 5;
+}
+
+bool isFiveOrRand(int i)
+{
+    return i == 5 || (i == std::rand() % 5);
+}
+
+TEST(Meta, IsConstexpr)
+{
+    EXPECT_TRUE( (is_constexpr<decltype(isFive), &isFive>(5)) );
+    EXPECT_TRUE( (is_constexpr<decltype(isFive), &isFive>(6)) );
+
+    EXPECT_FALSE( (is_constexpr<decltype(isFiveOrRand), &isFiveOrRand>(5)) );
+    EXPECT_FALSE( (is_constexpr<decltype(isFiveOrRand), &isFiveOrRand>(6)) );
+}
