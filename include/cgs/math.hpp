@@ -17,13 +17,25 @@
 #define CGS_MATH_HPP
 
 #include "cgs/assert.hpp"
-#include "cgs/meta.hpp"
+#include "cgs/meta.hpp" // is_constexpr
 
 #include <utility> // pair
 #include <cmath> // isnan, abs, tons of non constexpr stuff :(
 
 namespace cgs
 {
+
+namespace detail
+{
+
+template <typename T>
+constexpr bool isnan_nobuiltin(T value)
+{
+    return value != value;
+}
+
+} // namespace detail
+
 
 template <typename T, typename F>
 constexpr T lerp(const T& a, const T& b, F amount)
@@ -78,6 +90,21 @@ constexpr std::pair<Int, Int> divmod_down(Int n, Int d)
     Int quotient = div_down(n, d);
     Int remainder = n - d * quotient;
     return { quotient, remainder };
+}
+
+template <typename T>
+constexpr bool isnan(T value)
+{
+    // std::isnan is not yet required to be constexpr
+    constexpr auto standard = static_cast<bool(*)(T)>(std::isnan);
+
+    // use standard if it is constexpr
+    if constexpr(is_constexpr<standard, T>()) {
+        return standard(value);
+    }
+    else {
+        return detail::isnan_nobuiltin(value);
+    }
 }
 
 } // namespace cgs

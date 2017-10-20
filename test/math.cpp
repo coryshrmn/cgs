@@ -23,6 +23,8 @@ using cgs::is_between;
 using cgs::div_down;
 using cgs::mod_down;
 using cgs::divmod_down;
+using cgs::isnan;
+using cgs::detail::isnan_nobuiltin;
 
 TEST(Math, LerpConstexpr)
 {
@@ -92,4 +94,36 @@ TEST(Math, LerpDouble)
     constexpr double b = 1000.0;
     constexpr double half = lerp(a, b, 0.5);
     EXPECT_EQ(half, 750.0);
+}
+
+TEST(Math, IsNaN)
+{
+#define is(x) static_assert(isnan(x)); static_assert(isnan_nobuiltin(x))
+#define isnot(x) static_assert(!isnan(x)); static_assert(!isnan_nobuiltin(x))
+
+    is(NAN);
+    is(std::numeric_limits<float>::quiet_NaN());
+    is(std::numeric_limits<float>::signaling_NaN());
+    is(std::numeric_limits<double>::quiet_NaN());
+    is(std::numeric_limits<double>::signaling_NaN());
+    is(std::numeric_limits<long double>::quiet_NaN());
+    is(std::numeric_limits<long double>::signaling_NaN());
+
+    isnot(0.0f);
+    isnot(0.0);
+    isnot(static_cast<long double>(0));
+    isnot(1.0f);
+    isnot(1.0);
+    isnot(static_cast<long double>(1.0));
+    isnot(-1.0f);
+    isnot(-1.0);
+    isnot(static_cast<long double>(-1.0));
+    isnot(INFINITY);
+    isnot(-INFINITY);
+    isnot(std::numeric_limits<float>::infinity());
+    isnot(-std::numeric_limits<float>::infinity());
+    isnot(std::numeric_limits<double>::infinity());
+    isnot(-std::numeric_limits<double>::infinity());
+    isnot(std::numeric_limits<long double>::infinity());
+    isnot(-std::numeric_limits<long double>::infinity());
 }
