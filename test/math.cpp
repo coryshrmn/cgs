@@ -24,13 +24,36 @@ using cgs::div_down;
 using cgs::mod_down;
 using cgs::divmod_down;
 
-TEST(Math, LerpHalf)
+TEST(Math, LerpConstexpr)
 {
     constexpr float a = 500.0f;
     constexpr float b = 1000.0f;
     constexpr float half = lerp(a, b, 0.5f);
-    static_assert(half == 750.0f);
     EXPECT_EQ(half, 750.0f);
+}
+
+TEST(Math, LerpInside)
+{
+    constexpr float a = 500.0f;
+    constexpr float b = 1000.0f;
+    EXPECT_EQ(lerp(a, b, 0.25f), 625.0f);
+    EXPECT_EQ(lerp(a, b, 0.75f), 875.0f);
+}
+
+TEST(Math, LerpEdge)
+{
+    constexpr float a = 500.0f;
+    constexpr float b = 1000.0f;
+    EXPECT_EQ(lerp(a, b, 0.0f), a);
+    EXPECT_EQ(lerp(a, b, 1.0f), b);
+}
+
+TEST(Math, LerpOutside)
+{
+    constexpr float a = 500.0f;
+    constexpr float b = 1000.0f;
+    EXPECT_EQ(lerp(a, b, -1.0f), 0.0f);
+    EXPECT_EQ(lerp(a, b, 1.5f), 1250.0f);
 }
 
 TEST(Math, LerpNaN)
@@ -38,7 +61,35 @@ TEST(Math, LerpNaN)
     constexpr float a = std::numeric_limits<float>::quiet_NaN();
     constexpr float b = 1.0f;
     constexpr float half = lerp(a, b, 0.5f);
-    // static check for NaN or Infinities
-    static_assert(half != half);
+    constexpr float bbNaN = lerp(b, b, a);
     EXPECT_TRUE(std::isnan(half));
+    EXPECT_TRUE(std::isnan(bbNaN));
+    EXPECT_TRUE(std::isnan(lerp(b, a, 0.5f)));
+}
+
+TEST(Math, LerpInfinities)
+{
+    constexpr float inf = std::numeric_limits<float>::infinity();
+
+    // you can lerp in infinity either direction
+    EXPECT_FLOAT_EQ(lerp(0.0f, 1.0f, -inf), -inf);
+    EXPECT_FLOAT_EQ(lerp(0.0f, 1.0f, inf), inf);
+
+    // lerping from infinity doesn't make any sense, always return quiet nan
+    constexpr float nan = lerp(0.0f, inf, 1.0f);
+    EXPECT_TRUE(std::isnan(nan));
+    EXPECT_TRUE(std::isnan(lerp(0.0f, inf, 1.0f)));
+    EXPECT_TRUE(std::isnan(lerp(0.0f, inf, -1.0f)));
+    EXPECT_TRUE(std::isnan(lerp(1.0f, inf, 0.0f)));
+    EXPECT_TRUE(std::isnan(lerp(-inf, 0.0f, 0.0f)));
+    EXPECT_TRUE(std::isnan(lerp(-inf, 0.0f, 1.0f)));
+    EXPECT_TRUE(std::isnan(lerp(inf, inf, inf)));
+}
+
+TEST(Math, LerpDouble)
+{
+    constexpr double a = 500.0f;
+    constexpr double b = 1000.0f;
+    constexpr double half = lerp(a, b, 0.5);
+    EXPECT_EQ(half, 750.0);
 }

@@ -28,7 +28,11 @@ namespace cgs
 template <typename T, typename F>
 constexpr T lerp(const T& a, const T& b, F amount)
 {
-    return a + (b - a) * amount;
+    // TODO which is faster?
+    //return cgs_likely(std::isfinite(b - a))
+    return cgs_likely(std::isfinite(a) && std::isfinite(b))
+        ? a + (b - a) * amount
+        : std::numeric_limits<T>::quiet_NaN();
 }
 
 template <typename T>
