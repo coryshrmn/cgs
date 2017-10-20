@@ -20,6 +20,7 @@
 #include "cgs/algorithm.hpp"
 #include "cgs/assert.hpp"
 #include "cgs/macro.hpp"
+#include "cgs/math.hpp"
 #include "cgs/optimize.hpp"
 #include "cgs/unowned_ptr.hpp"
 

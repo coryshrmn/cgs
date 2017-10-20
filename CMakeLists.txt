@@ -29,6 +29,7 @@ set(CGS_HEADERS
     "include/cgs/algorithm.hpp"
     "include/cgs/assert.hpp"
     "include/cgs/macro.hpp"
+    "include/cgs/math.hpp"
     "include/cgs/optimize.hpp"
     "include/cgs/unowned_ptr.hpp"
 )
@@ -41,6 +42,7 @@ set(CGS_TEST_SOURCE
     "test/assert_release.cpp"
     "test/assert_throw.cpp"
     "test/assert_undefined.cpp"
+    "test/math.cpp"
     "test/unowned_ptr.cpp"
 )
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
