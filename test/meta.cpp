@@ -58,6 +58,10 @@ TEST(Meta, IsConstexpr)
 
     EXPECT_FALSE( (is_constexpr<unsafe_v>()) );
     EXPECT_FALSE( (is_constexpr<safe_if_nonzero>(0)) );
+
+    // can also check at compile time
+    static_assert(is_constexpr<safe_fi>(0.0f, 0));
+    static_assert(!is_constexpr<unsafe_v>());
 }
 
 TEST(Meta, IsConstexprSafeIfZero)
