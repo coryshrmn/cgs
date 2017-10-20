@@ -73,7 +73,10 @@ TEST(Meta, IsConstexprSafeIfZero)
     // even though unsafe_inot is not generally constexpr
     // see GitHub issue #1
     //
-    // I don't know how we can test if a function is generally constexpr.
+    // I don't think it is possible to test if a function is generally constexpr.
+    //
+    // It might be possible check if Func is constexpr with provided values.
+    // I haven't figured it out yet.
 
     EXPECT_FALSE( (is_constexpr<safe_if_zero>(0)) );
 }
