@@ -13,11 +13,23 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 */
-#ifndef CGS_META_HPP
-#define CGS_META_HPP
+#ifndef CGS_META_IGNORE_HPP
+#define CGS_META_IGNORE_HPP
 
-#include "cgs/meta/ignore.hpp"
-#include "cgs/meta/constexpr.hpp"
-#include "cgs/meta/invocable.hpp"
+#include <type_traits>
 
-#endif // CGS_META_HPP
+namespace cgs
+{
+
+/**
+ * @brief ignore the value of T, return integral type
+ */
+template <typename T>
+constexpr bool ignore(T&&)
+{
+    return true;
+}
+
+} // namespace cgs
+
+#endif // CGS_META_IGNORE_HPP
