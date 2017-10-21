@@ -25,13 +25,15 @@ using cgs::mod_down;
 using cgs::divmod_down;
 using cgs::isnan;
 using cgs::detail::isnan_nobuiltin;
+using cgs::isfinite;
+using cgs::detail::isfinite_nobuiltin;
 
 TEST(Math, LerpConstexpr)
 {
     constexpr float a = 500.0f;
     constexpr float b = 1000.0f;
     constexpr float half = lerp(a, b, 0.5f);
-    EXPECT_EQ(half, 750.0f);
+    static_assert(half == 750.0f);
 }
 
 TEST(Math, LerpInside)
@@ -62,8 +64,8 @@ TEST(Math, LerpNaN)
 {
     constexpr float a = std::numeric_limits<float>::quiet_NaN();
     constexpr float b = 1.0f;
-    constexpr float half = lerp(a, b, 0.5f);
-    constexpr float bbNaN = lerp(b, b, a);
+    const float half = lerp(a, b, 0.5f);
+    const float bbNaN = lerp(b, b, a);
     EXPECT_TRUE(std::isnan(half));
     EXPECT_TRUE(std::isnan(bbNaN));
     EXPECT_TRUE(std::isnan(lerp(b, a, 0.5f)));
@@ -78,21 +80,25 @@ TEST(Math, LerpInfinities)
     EXPECT_FLOAT_EQ(lerp(0.0f, 1.0f, inf), inf);
 
     // lerping from infinity doesn't make any sense, always return quiet nan
-    constexpr float nan = lerp(0.0f, inf, 1.0f);
-    EXPECT_TRUE(std::isnan(nan));
     EXPECT_TRUE(std::isnan(lerp(0.0f, inf, 1.0f)));
     EXPECT_TRUE(std::isnan(lerp(0.0f, inf, -1.0f)));
     EXPECT_TRUE(std::isnan(lerp(1.0f, inf, 0.0f)));
     EXPECT_TRUE(std::isnan(lerp(-inf, 0.0f, 0.0f)));
     EXPECT_TRUE(std::isnan(lerp(-inf, 0.0f, 1.0f)));
     EXPECT_TRUE(std::isnan(lerp(inf, inf, inf)));
+    EXPECT_TRUE(std::isnan(lerp(-inf, inf, -1.0f)));
+    EXPECT_TRUE(std::isnan(lerp(-inf, inf, 0.0f)));
+    EXPECT_TRUE(std::isnan(lerp(-inf, inf, 1.0f)));
+    EXPECT_TRUE(std::isnan(lerp(-inf, inf, 2.0f)));
+
+    std::cout << "FLT_MAX: " << FLT_MAX << std::endl;
 }
 
 TEST(Math, LerpDouble)
 {
     constexpr double a = 500.0;
     constexpr double b = 1000.0;
-    constexpr double half = lerp(a, b, 0.5);
+    const double half = lerp(a, b, 0.5);
     EXPECT_EQ(half, 750.0);
 }
 
@@ -126,32 +132,65 @@ TEST(Math, IsBetween)
 
 TEST(Math, IsNaN)
 {
-#define is(x) static_assert(isnan(x)); static_assert(isnan_nobuiltin(x))
-#define isnot(x) static_assert(!isnan(x)); static_assert(!isnan_nobuiltin(x))
+#define ISNAN(x) static_assert(cgs::isnan(x)); static_assert(isnan_nobuiltin(x)); EXPECT_TRUE(std::isnan(x))
+#define ISNOTNAN(x) static_assert(!cgs::isnan(x)); static_assert(!isnan_nobuiltin(x)); EXPECT_FALSE(std::isnan(x))
 
-    is(NAN);
-    is(std::numeric_limits<float>::quiet_NaN());
-    is(std::numeric_limits<float>::signaling_NaN());
-    is(std::numeric_limits<double>::quiet_NaN());
-    is(std::numeric_limits<double>::signaling_NaN());
-    is(std::numeric_limits<long double>::quiet_NaN());
-    is(std::numeric_limits<long double>::signaling_NaN());
+    ISNAN(NAN);
+    ISNAN(std::numeric_limits<float>::quiet_NaN());
+    ISNAN(std::numeric_limits<float>::signaling_NaN());
+    ISNAN(std::numeric_limits<double>::quiet_NaN());
+    ISNAN(std::numeric_limits<double>::signaling_NaN());
+    ISNAN(std::numeric_limits<long double>::quiet_NaN());
+    ISNAN(std::numeric_limits<long double>::signaling_NaN());
 
-    isnot(0.0f);
-    isnot(0.0);
-    isnot(static_cast<long double>(0));
-    isnot(1.0f);
-    isnot(1.0);
-    isnot(static_cast<long double>(1.0));
-    isnot(-1.0f);
-    isnot(-1.0);
-    isnot(static_cast<long double>(-1.0));
-    isnot(INFINITY);
-    isnot(-INFINITY);
-    isnot(std::numeric_limits<float>::infinity());
-    isnot(-std::numeric_limits<float>::infinity());
-    isnot(std::numeric_limits<double>::infinity());
-    isnot(-std::numeric_limits<double>::infinity());
-    isnot(std::numeric_limits<long double>::infinity());
-    isnot(-std::numeric_limits<long double>::infinity());
+    ISNOTNAN(0.0f);
+    ISNOTNAN(0.0);
+    ISNOTNAN(static_cast<long double>(0));
+    ISNOTNAN(1.0f);
+    ISNOTNAN(1.0);
+    ISNOTNAN(static_cast<long double>(1.0));
+    ISNOTNAN(-1.0f);
+    ISNOTNAN(-1.0);
+    ISNOTNAN(static_cast<long double>(-1.0));
+    ISNOTNAN(INFINITY);
+    ISNOTNAN(-INFINITY);
+    ISNOTNAN(std::numeric_limits<float>::infinity());
+    ISNOTNAN(-std::numeric_limits<float>::infinity());
+    ISNOTNAN(std::numeric_limits<double>::infinity());
+    ISNOTNAN(-std::numeric_limits<double>::infinity());
+    ISNOTNAN(std::numeric_limits<long double>::infinity());
+    ISNOTNAN(-std::numeric_limits<long double>::infinity());
+}
+
+TEST(Math, IsFinite)
+{
+#define ISFINITE(x) static_assert(cgs::isfinite(x)); static_assert(isfinite_nobuiltin(x)); EXPECT_TRUE(std::isfinite(x))
+#define ISNOTFINITE(x) static_assert(!cgs::isfinite(x)); static_assert(!isfinite_nobuiltin(x)); EXPECT_FALSE(std::isfinite(x))
+
+    ISFINITE(0.0f);
+    ISFINITE(0.0);
+    ISFINITE(static_cast<long double>(0));
+    ISFINITE(1.0f);
+    ISFINITE(1.0);
+    ISFINITE(static_cast<long double>(1.0));
+    ISFINITE(-1.0f);
+    ISFINITE(-1.0);
+    ISFINITE(static_cast<long double>(-1.0));
+
+    ISNOTFINITE(NAN);
+    ISNOTFINITE(std::numeric_limits<float>::quiet_NaN());
+    ISNOTFINITE(std::numeric_limits<float>::signaling_NaN());
+    ISNOTFINITE(std::numeric_limits<double>::quiet_NaN());
+    ISNOTFINITE(std::numeric_limits<double>::signaling_NaN());
+    ISNOTFINITE(std::numeric_limits<long double>::quiet_NaN());
+    ISNOTFINITE(std::numeric_limits<long double>::signaling_NaN());
+
+    ISNOTFINITE(INFINITY);
+    ISNOTFINITE(-INFINITY);
+    ISNOTFINITE(std::numeric_limits<float>::infinity());
+    ISNOTFINITE(-std::numeric_limits<float>::infinity());
+    ISNOTFINITE(std::numeric_limits<double>::infinity());
+    ISNOTFINITE(-std::numeric_limits<double>::infinity());
+    ISNOTFINITE(std::numeric_limits<long double>::infinity());
+    ISNOTFINITE(-std::numeric_limits<long double>::infinity());
 }

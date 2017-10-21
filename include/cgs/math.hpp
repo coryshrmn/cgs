@@ -17,13 +17,32 @@
 #define CGS_MATH_HPP
 
 #include "cgs/assert.hpp"
-#include "cgs/meta.hpp" // is_constexpr
+#include "cgs/meta/constexpr.hpp"
 
-#include <utility> // pair
 #include <cmath> // isnan, abs, tons of non constexpr stuff :(
+#include <limits> // numeric_limits
+#include <type_traits>
+#include <utility> // pair
 
 namespace cgs
 {
+
+template <typename T>
+constexpr bool is_between(const T& val, const T& min, const T& max)
+{
+    // min may be greater than max,
+    // in which case val is never between them
+    return min <= val && val <= max;
+}
+
+template <typename T>
+inline constexpr bool is_arithmetic_v = std::is_arithmetic<T>::value;
+
+template <typename T>
+inline constexpr bool is_integral_v = std::is_integral<T>::value;
+
+template <typename T>
+inline constexpr bool is_floating_point_v = std::is_floating_point<T>::value;
 
 namespace detail
 {
@@ -34,15 +53,56 @@ constexpr bool isnan_nobuiltin(T value)
     return value != value;
 }
 
+template <typename T>
+constexpr std::enable_if_t<is_arithmetic_v<T>,
+    bool> isfinite_nobuiltin(T value)
+{
+    if constexpr(is_integral_v<T>) {
+        return true;
+    }
+    else {
+        return is_between(value, -std::numeric_limits<T>::max(), std::numeric_limits<T>::max());
+    }
+}
+
 } // namespace detail
 
+template <typename T>
+constexpr bool isnan(T value)
+{
+    // std::isnan is not yet required to be constexpr
+    constexpr auto standard = static_cast<bool(*)(T)>(std::isnan);
+
+    // use standard if it is constexpr
+    if constexpr(is_constexpr<standard, T>()) {
+        return standard(value);
+    }
+    else {
+        return detail::isnan_nobuiltin(value);
+    }
+}
+
+template <typename T>
+constexpr bool isfinite(T value)
+{
+    // std::isfinite is not yet required to be constexpr
+    constexpr auto standard = static_cast<bool(*)(T)>(std::isfinite);
+
+    // use standard if it is constexpr
+    if constexpr(is_constexpr<standard, T>()) {
+        return standard(value);
+    }
+    else {
+        return detail::isfinite_nobuiltin(value);
+    }
+}
 
 template <typename T, typename F>
 constexpr T lerp(const T& a, const T& b, F amount)
 {
     // TODO which is faster?
-    //return cgs_likely(std::isfinite(b - a))
-    return cgs_likely(std::isfinite(a) && std::isfinite(b))
+    //return cgs_likely(cgs::isfinite(b - a))
+    return cgs_likely(cgs::isfinite(a) && cgs::isfinite(b))
         ? a + (b - a) * amount
         : std::numeric_limits<T>::quiet_NaN();
 }
@@ -56,14 +116,6 @@ constexpr const T& clamp(const T& val, const T& min, const T& max)
             ? val
             : min)
         : max;
-}
-
-template <typename T>
-constexpr bool is_between(const T& val, const T& min, const T& max)
-{
-    // min may be greater than max,
-    // in which case val is never between them
-    return min <= val && val <= max;
 }
 
 template <typename Int>
@@ -90,21 +142,6 @@ constexpr std::pair<Int, Int> divmod_down(Int n, Int d)
     Int quotient = div_down(n, d);
     Int remainder = n - d * quotient;
     return { quotient, remainder };
-}
-
-template <typename T>
-constexpr bool isnan(T value)
-{
-    // std::isnan is not yet required to be constexpr
-    constexpr auto standard = static_cast<bool(*)(T)>(std::isnan);
-
-    // use standard if it is constexpr
-    if constexpr(is_constexpr<standard, T>()) {
-        return standard(value);
-    }
-    else {
-        return detail::isnan_nobuiltin(value);
-    }
 }
 
 } // namespace cgs
