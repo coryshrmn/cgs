@@ -70,6 +70,16 @@ constexpr std::enable_if_t<is_arithmetic_v<T>,
 template <typename T>
 constexpr bool isnan(T value)
 {
+
+#if _GLIBCXX_HAVE_OBSOLETE_ISNAN \
+  && !_GLIBCXX_NO_OBSOLETE_ISINF_ISNAN_DYNAMIC
+// Workaround for old glibcxx:
+// `std::isnan` is defined incorrectly,
+// which prevents `is_constexpr<std::isnan>` from compiling.
+#define CGS_BUILTIN_NAN_INVALID
+#endif
+
+#ifndef CGS_BUILTIN_NAN_INVALID
     // std::isnan is not yet required to be constexpr
     constexpr auto standard = static_cast<bool(*)(T)>(std::isnan);
 
@@ -77,9 +87,9 @@ constexpr bool isnan(T value)
     if constexpr(is_constexpr<standard, T>()) {
         return standard(value);
     }
-    else {
-        return detail::isnan_nobuiltin(value);
-    }
+#endif
+
+    return detail::isnan_nobuiltin(value);
 }
 
 template <typename T>
