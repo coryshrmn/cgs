@@ -25,7 +25,6 @@ matrix:
                     sources: ['ubuntu-toolchain-r-test']
                     packages:
                         - 'g++-7'
-                        - 'libboost-dev'
             env: C_COMPILER='gcc-7' CXX_COMPILER='g++-7'
 before_script:
     - export CC=${C_COMPILER}
