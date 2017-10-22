@@ -107,6 +107,20 @@ constexpr bool isfinite(T value)
     }
 }
 
+template <typename T>
+constexpr T abs(T value)
+{
+    // std::abs is not yet required to be constexpr
+    constexpr auto standard = static_cast<T(*)(T)>(std::abs);
+
+    if constexpr(is_constexpr<standard, T>()) {
+        return standard(value);
+    }
+    else {
+        return value < T{} ? -value : value;
+    }
+}
+
 template <typename T, typename F>
 constexpr T lerp(const T& a, const T& b, F amount)
 {
