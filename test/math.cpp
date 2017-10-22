@@ -130,6 +130,38 @@ TEST(Math, IsBetween)
     static_assert(!is_between(2, 0, 1));
 }
 
+TEST(Math, DivModDown)
+{
+#if 0 // static assertions
+#define dm_down(n, d, expected_q, expected_r) \
+    static_assert(div_down(n, d) == expected_q); \
+    static_assert(mod_down(n, d) == expected_r); \
+    static_assert(divmod_down(n, d).first == expected_q); \
+    static_assert(divmod_down(n, d).second == expected_r)
+#else // runtime expectations
+#define dm_down(n, d, expected_q, expected_r) \
+    EXPECT_EQ(div_down(n, d), expected_q); \
+    EXPECT_EQ(mod_down(n, d), expected_r); \
+    EXPECT_EQ(divmod_down(n, d).first, expected_q); \
+    EXPECT_EQ(divmod_down(n, d).second, expected_r)
+#endif
+
+    dm_down(52, 10, 5, 2);
+    dm_down(-8, 10, -1, 2);
+    dm_down(0, 256, 0, 0);
+    dm_down(-1, 256, -1, 255);
+    dm_down(-1000, -2, 500, 0);
+    dm_down(-1001, -2, 500, 1);
+    dm_down(-999, -2, 499, 1);
+    dm_down(-1000, 2, -500, 0);
+    dm_down(-999, 2, -500, 1);
+    dm_down(1000, 2, 500, 0);
+    dm_down(1001, 2, 500, 1);
+
+    dm_down(-10, -10, 1, 0);
+    dm_down(-11, -10, 1, 9);
+}
+
 TEST(Math, IsNaN)
 {
 #define ISNAN(x) static_assert(cgs::isnan(x)); static_assert(isnan_nobuiltin(x)); EXPECT_TRUE(std::isnan(x))
