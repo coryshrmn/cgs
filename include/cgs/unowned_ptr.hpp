@@ -17,6 +17,7 @@
 #define CGS_UNOWNED_PTR_HPP
 
 #include "cgs/assert.hpp"
+#include "cgs/meta.hpp"
 
 namespace cgs
 {
@@ -34,6 +35,11 @@ public:
 
     constexpr /* implicit */ unowned_ptr(T* p) noexcept
         : _p(p)
+    { }
+
+    template < typename U, typename = enable_if_t<is_convertible_v<U*, T*>> >
+    constexpr /* implicit */ unowned_ptr(const unowned_ptr<U>& source) noexcept
+        : _p(source.or_null())
     { }
 
     /**

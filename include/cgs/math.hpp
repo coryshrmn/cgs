@@ -153,7 +153,7 @@ enum class div_round_mode
     euclid,
 };
 
-template <div_round_mode RoundMode, typename Int>//, typename = enable_if_t<is_integral_v<Int>>>
+template <div_round_mode RoundMode, typename Int, typename = enable_if_t<is_integral_v<Int>>>
 constexpr Int div(Int n, Int d)
 {
     cgs_assert(d != 0);
@@ -175,7 +175,7 @@ constexpr Int div(Int n, Int d)
     }
 }
 
-template <div_round_mode RoundMode, typename Int>//, typename = enable_if_t<is_integral_v<Int>>>
+template <div_round_mode RoundMode, typename Int, typename = enable_if_t<is_integral_v<Int>>>
 constexpr Int mod(Int n, Int d)
 {
     cgs_assert(d != 0);
@@ -197,7 +197,7 @@ constexpr Int mod(Int n, Int d)
     }
 }
 
-template <div_round_mode RoundMode, typename Int>//, typename = enable_if_t<is_integral_v<Int>>>
+template <div_round_mode RoundMode, typename Int, typename = enable_if_t<is_integral_v<Int>>>
 std::pair<Int, Int> divmod(Int n, Int d)
 {
     return { div<RoundMode>(n, d), mod<RoundMode>(n, d) };

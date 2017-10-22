@@ -16,11 +16,16 @@
 #ifndef CGS_META_INVOCABLE_HPP
 #define CGS_META_INVOCABLE_HPP
 
+#include <type_traits>
+
 namespace cgs
 {
 
 template <bool Enabled, typename T = void>
-using enable_if_t = typename std::enable_if<Enabled, T>::value;
+using enable_if_t = typename std::enable_if<Enabled, T>::type;
+
+template <typename From, typename To>
+inline constexpr bool is_convertible_v = std::is_convertible<From, To>::value;
 
 } // namespace cgs
 
