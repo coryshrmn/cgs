@@ -16,6 +16,14 @@
 #ifndef CGS_META_INVOCABLE_HPP
 #define CGS_META_INVOCABLE_HPP
 
+namespace cgs
+{
+
+template <bool Enabled, typename T = void>
+using enable_if_t = typename std::enable_if<Enabled, T>::value;
+
+} // namespace cgs
+
 // disable, this is all a work in progress, may not compile
 # if 0
 
@@ -132,9 +140,6 @@ constexpr bool is_member_pointer_v = std::is_member_pointer<T>::value;
 
 template <typename T>
 using decay_t = typename std::decay<T>::type;
-
-template <bool Enabled, typename T = void>
-using enable_if_t = typename std::enable_if<Enabled, T>::value;
 
 // invoke ordinary function or functor
 template <typename Func, typename... Args>

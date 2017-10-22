@@ -44,6 +44,9 @@ inline constexpr bool is_integral_v = std::is_integral<T>::value;
 template <typename T>
 inline constexpr bool is_floating_point_v = std::is_floating_point<T>::value;
 
+template <typename T>
+inline constexpr bool is_signed_v = std::is_signed<T>::value;
+
 namespace detail
 {
 
@@ -142,30 +145,116 @@ constexpr const T& clamp(const T& val, const T& min, const T& max)
         : max;
 }
 
-template <typename Int>
-constexpr Int div_down(Int n, Int d)
+// see https://en.wikipedia.org/wiki/Modulo_operation#/media/File:Divmod.svg
+enum class div_round_mode
 {
-    Int quotient = n / d;
-    return (d * quotient <= n)
-        ?  quotient
-        : quotient - 1;
+    trunc,
+    floor,
+    euclid,
+};
+
+template <div_round_mode RoundMode, typename Int>//, typename = enable_if_t<is_integral_v<Int>>>
+constexpr Int div(Int n, Int d)
+{
+    cgs_assert(d != 0);
+
+    if constexpr(RoundMode == div_round_mode::trunc || !is_signed_v<Int>) {
+        return n / d;
+    }
+    else if constexpr(RoundMode == div_round_mode::floor) {
+        if((n < 0) != (d < 0)) {
+            n -= d - 1;
+        }
+        return n / d;
+    }
+    else if constexpr(RoundMode == div_round_mode::euclid) {
+        if(n < 0) {
+            n -= cgs::abs(d) - 1;
+        }
+        return n / d;
+    }
 }
 
-template <typename Int>
-constexpr Int mod_down(Int n, Int d)
+template <div_round_mode RoundMode, typename Int>//, typename = enable_if_t<is_integral_v<Int>>>
+constexpr Int mod(Int n, Int d)
 {
-    Int remainder = n % d;
-    return remainder >= 0
-        ? remainder
-        : remainder + d;
+    cgs_assert(d != 0);
+
+    if constexpr(RoundMode == div_round_mode::trunc || !is_signed_v<Int>) {
+        return n % d;
+    }
+    else if constexpr(RoundMode == div_round_mode::floor) {
+        if((n < 0) != (d < 0)) {
+            return n % d + d;
+        }
+        return n % d;
+    }
+    else if constexpr(RoundMode == div_round_mode::euclid) {
+        if(n < 0) {
+            return n % d + cgs::abs(d);
+        }
+        return n % d;
+    }
 }
 
-template <typename Int>
-constexpr std::pair<Int, Int> divmod_down(Int n, Int d)
+template <div_round_mode RoundMode, typename Int>//, typename = enable_if_t<is_integral_v<Int>>>
+std::pair<Int, Int> divmod(Int n, Int d)
 {
-    Int quotient = div_down(n, d);
-    Int remainder = n - d * quotient;
-    return { quotient, remainder };
+    return { div<RoundMode>(n, d), mod<RoundMode>(n, d) };
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr Int div_trunc(Int n, Int d)
+{
+    return div<div_round_mode::trunc>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr Int div_floor(Int n, Int d)
+{
+    return div<div_round_mode::floor>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr Int div_euclid(Int n, Int d)
+{
+    return div<div_round_mode::euclid>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr Int mod_trunc(Int n, Int d)
+{
+    return mod<div_round_mode::trunc>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr Int mod_floor(Int n, Int d)
+{
+    return mod<div_round_mode::floor>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr Int mod_euclid(Int n, Int d)
+{
+    return mod<div_round_mode::euclid>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr std::pair<Int, Int> divmod_trunc(Int n, Int d)
+{
+    return divmod<div_round_mode::trunc>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr std::pair<Int, Int> divmod_floor(Int n, Int d)
+{
+    return divmod<div_round_mode::floor>(n, d);
+}
+
+template <div_round_mode RoundMode, typename Int>
+constexpr std::pair<Int, Int> divmod_euclid(Int n, Int d)
+{
+    return divmod<div_round_mode::euclid>(n, d);
 }
 
 } // namespace cgs

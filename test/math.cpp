@@ -20,9 +20,10 @@
 using cgs::lerp;
 using cgs::clamp;
 using cgs::is_between;
-using cgs::div_down;
-using cgs::mod_down;
-using cgs::divmod_down;
+using cgs::div;
+using cgs::div_round_mode;
+using cgs::mod;
+using cgs::divmod;
 using cgs::isnan;
 using cgs::detail::isnan_nobuiltin;
 using cgs::isfinite;
@@ -90,8 +91,6 @@ TEST(Math, LerpInfinities)
     EXPECT_TRUE(std::isnan(lerp(-inf, inf, 0.0f)));
     EXPECT_TRUE(std::isnan(lerp(-inf, inf, 1.0f)));
     EXPECT_TRUE(std::isnan(lerp(-inf, inf, 2.0f)));
-
-    std::cout << "FLT_MAX: " << FLT_MAX << std::endl;
 }
 
 TEST(Math, LerpDouble)
@@ -130,36 +129,56 @@ TEST(Math, IsBetween)
     static_assert(!is_between(2, 0, 1));
 }
 
-TEST(Math, DivModDown)
-{
 #if 0 // static assertions
-#define dm_down(n, d, expected_q, expected_r) \
-    static_assert(div_down(n, d) == expected_q); \
-    static_assert(mod_down(n, d) == expected_r); \
-    static_assert(divmod_down(n, d).first == expected_q); \
-    static_assert(divmod_down(n, d).second == expected_r)
+#define expect_dm(mode, n, d, expected_q, expected_r) \
+    static_assert(div<mode>(n, d) == expected_q); \
+    static_assert(mod<mode>(n, d) == expected_r); \
+    static_assert(divmod<mode>(n, d).first == expected_q); \
+    static_assert(divmod<mode>(n, d).second == expected_r)
 #else // runtime expectations
-#define dm_down(n, d, expected_q, expected_r) \
-    EXPECT_EQ(div_down(n, d), expected_q); \
-    EXPECT_EQ(mod_down(n, d), expected_r); \
-    EXPECT_EQ(divmod_down(n, d).first, expected_q); \
-    EXPECT_EQ(divmod_down(n, d).second, expected_r)
+#define expect_dm(mode, n, d, expected_q, expected_r) \
+    EXPECT_EQ(div<mode>(n, d), expected_q); \
+    EXPECT_EQ(mod<mode>(n, d), expected_r); \
+    EXPECT_EQ(divmod<mode>(n, d).first, expected_q); \
+    EXPECT_EQ(divmod<mode>(n, d).second, expected_r)
 #endif
 
-    dm_down(52, 10, 5, 2);
-    dm_down(-8, 10, -1, 2);
-    dm_down(0, 256, 0, 0);
-    dm_down(-1, 256, -1, 255);
-    dm_down(-1000, -2, 500, 0);
-    dm_down(-1001, -2, 500, 1);
-    dm_down(-999, -2, 499, 1);
-    dm_down(-1000, 2, -500, 0);
-    dm_down(-999, 2, -500, 1);
-    dm_down(1000, 2, 500, 0);
-    dm_down(1001, 2, 500, 1);
+TEST(Math, DivModTrunc)
+{
+    // default rounding mode in modern C/C++
 
-    dm_down(-10, -10, 1, 0);
-    dm_down(-11, -10, 1, 9);
+    // quotient copies sign from dividend,
+    // remainder copies sign from divisor
+
+    expect_dm(div_round_mode::trunc, -43,  10, -4, -3);
+    expect_dm(div_round_mode::trunc,  43,  10,  4,  3);
+
+    expect_dm(div_round_mode::trunc, -43, -10,  4, -3);
+    expect_dm(div_round_mode::trunc,  43, -10, -4,  3);
+}
+
+TEST(Math, DivModFloor)
+{
+    // n == d * q + r
+    // quotient is floor(n / d)
+
+    expect_dm(div_round_mode::floor, -43,  10, -5,  7);
+    expect_dm(div_round_mode::floor,  43,  10,  4,  3);
+
+    expect_dm(div_round_mode::floor,  43, -10, -5, -7);
+    expect_dm(div_round_mode::floor, -43, -10,  4, -3);
+}
+
+TEST(Math, DivModEuclid)
+{
+    // n == d * q + r
+    // remainder is always positive
+
+    expect_dm(div_round_mode::euclid, -43,  10, -5,  7);
+    expect_dm(div_round_mode::euclid,  43,  10,  4,  3);
+
+    expect_dm(div_round_mode::euclid,  43, -10, -4,  3);
+    expect_dm(div_round_mode::euclid, -43, -10,  5,  7);
 }
 
 TEST(Math, IsNaN)
