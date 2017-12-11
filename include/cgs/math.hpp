@@ -180,20 +180,22 @@ constexpr Int mod(Int n, Int d)
 {
     cgs_assert(d != 0);
 
+    const Int builtin = n % d;
+
     if constexpr(RoundMode == div_round_mode::trunc || !is_signed_v<Int>) {
-        return n % d;
+        return builtin;
     }
     else if constexpr(RoundMode == div_round_mode::floor) {
-        if((n < 0) != (d < 0)) {
-            return n % d + d;
+        if((n < 0) != (d < 0) && builtin != 0) {
+            return builtin + d;
         }
-        return n % d;
+        return builtin;
     }
     else if constexpr(RoundMode == div_round_mode::euclid) {
-        if(n < 0) {
-            return n % d + cgs::abs(d);
+        if(n < 0 && builtin != 0) {
+            return builtin + cgs::abs(d);
         }
-        return n % d;
+        return builtin;
     }
 }
 

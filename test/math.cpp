@@ -155,6 +155,8 @@ TEST(Math, DivModTrunc)
 
     expect_dm(div_round_mode::trunc, -43, -10,  4, -3);
     expect_dm(div_round_mode::trunc,  43, -10, -4,  3);
+
+    expect_dm(div_round_mode::trunc, -99, 11, -9, 0);
 }
 
 TEST(Math, DivModFloor)
@@ -167,6 +169,8 @@ TEST(Math, DivModFloor)
 
     expect_dm(div_round_mode::floor,  43, -10, -5, -7);
     expect_dm(div_round_mode::floor, -43, -10,  4, -3);
+
+    expect_dm(div_round_mode::floor, -99, 11, -9, 0);
 }
 
 TEST(Math, DivModEuclid)
@@ -179,6 +183,8 @@ TEST(Math, DivModEuclid)
 
     expect_dm(div_round_mode::euclid,  43, -10, -4,  3);
     expect_dm(div_round_mode::euclid, -43, -10,  5,  7);
+
+    expect_dm(div_round_mode::euclid, -99, 11, -9, 0);
 }
 
 TEST(Math, IsNaN)
