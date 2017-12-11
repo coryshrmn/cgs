@@ -205,55 +205,55 @@ std::pair<Int, Int> divmod(Int n, Int d)
     return { div<RoundMode>(n, d), mod<RoundMode>(n, d) };
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr Int div_trunc(Int n, Int d)
 {
     return div<div_round_mode::trunc>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr Int div_floor(Int n, Int d)
 {
     return div<div_round_mode::floor>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr Int div_euclid(Int n, Int d)
 {
     return div<div_round_mode::euclid>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr Int mod_trunc(Int n, Int d)
 {
     return mod<div_round_mode::trunc>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr Int mod_floor(Int n, Int d)
 {
     return mod<div_round_mode::floor>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr Int mod_euclid(Int n, Int d)
 {
     return mod<div_round_mode::euclid>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr std::pair<Int, Int> divmod_trunc(Int n, Int d)
 {
     return divmod<div_round_mode::trunc>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr std::pair<Int, Int> divmod_floor(Int n, Int d)
 {
     return divmod<div_round_mode::floor>(n, d);
 }
 
-template <div_round_mode RoundMode, typename Int>
+template <typename Int>
 constexpr std::pair<Int, Int> divmod_euclid(Int n, Int d)
 {
     return divmod<div_round_mode::euclid>(n, d);
