@@ -139,8 +139,8 @@ TEST(Math, IsBetween)
 #define expect_dm(mode, n, d, expected_q, expected_r) \
     EXPECT_EQ(div<mode>(n, d), expected_q); \
     EXPECT_EQ(mod<mode>(n, d), expected_r); \
-    EXPECT_EQ(divmod<mode>(n, d).first, expected_q); \
-    EXPECT_EQ(divmod<mode>(n, d).second, expected_r)
+    EXPECT_EQ(divmod<mode>(n, d).quot, expected_q); \
+    EXPECT_EQ(divmod<mode>(n, d).rem, expected_r)
 #endif
 
 TEST(Math, DivModTrunc)

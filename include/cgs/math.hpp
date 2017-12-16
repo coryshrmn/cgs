@@ -153,6 +153,12 @@ enum class div_round_mode
     euclid,
 };
 
+template <typename Int>
+struct div_type
+{
+    Int quot, rem;
+};
+
 template <div_round_mode RoundMode, typename Int, typename = enable_if_t<is_integral_v<Int>>>
 constexpr Int div(Int n, Int d)
 {
@@ -200,7 +206,7 @@ constexpr Int mod(Int n, Int d)
 }
 
 template <div_round_mode RoundMode, typename Int, typename = enable_if_t<is_integral_v<Int>>>
-std::pair<Int, Int> divmod(Int n, Int d)
+div_type<Int> divmod(Int n, Int d)
 {
     return { div<RoundMode>(n, d), mod<RoundMode>(n, d) };
 }
@@ -242,19 +248,19 @@ constexpr Int mod_euclid(Int n, Int d)
 }
 
 template <typename Int>
-constexpr std::pair<Int, Int> divmod_trunc(Int n, Int d)
+constexpr div_type<Int> divmod_trunc(Int n, Int d)
 {
     return divmod<div_round_mode::trunc>(n, d);
 }
 
 template <typename Int>
-constexpr std::pair<Int, Int> divmod_floor(Int n, Int d)
+constexpr div_type<Int> divmod_floor(Int n, Int d)
 {
     return divmod<div_round_mode::floor>(n, d);
 }
 
 template <typename Int>
-constexpr std::pair<Int, Int> divmod_euclid(Int n, Int d)
+constexpr div_type<Int> divmod_euclid(Int n, Int d)
 {
     return divmod<div_round_mode::euclid>(n, d);
 }
