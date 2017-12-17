@@ -22,15 +22,15 @@
  * @brief Optimizer hint, do not evaluate.
  */
 #ifdef __clang__
-    #define cgs_assume(expr) __builtin_assume(expr)
+    #define cgs_assume(expr) __builtin_assume(static_cast<bool>(expr))
 #elif defined(_MSC_VER)
-    #define cgs_assume(expr) __assume(expr)
+    #define cgs_assume(expr) __assume(static_cast<bool>(expr))
 #else
-    #define cgs_assume(expr) static_cast<void>(sizeof(expr))
+    #define cgs_assume(expr) static_cast<void>(sizeof(static_cast<bool>(expr)))
 #endif
 
 #if defined(__clang__) || defined(__GNUC__)
-    #define cgs_expect(expr, val) __builtin_expect(expr, val)
+    #define cgs_expect(expr, val) __builtin_expect(static_cast<long>(expr), val)
     #define cgs_unreachable() __builtin_unreachable()
 #else
     #define cgs_expect(expr, val) static_cast<long>(expr)
