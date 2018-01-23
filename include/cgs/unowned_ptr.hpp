@@ -79,6 +79,14 @@ public:
     }
 
     /**
+     * @brief Explicitly get the pointer, even if it is null.
+     */
+    constexpr T* get() const noexcept
+    {
+        return _p;
+    }
+
+    /**
      * @brief Is this not null?
      */
     constexpr operator bool() const noexcept
